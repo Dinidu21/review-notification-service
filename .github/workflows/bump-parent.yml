@@ -19,29 +19,32 @@ jobs:
 
       - name: Update submodule pointer to latest main
         run: |
-          git -C "review-notification-service" fetch origin main
-          git -C "review-notification-service" checkout origin/main
+          git -C "event-booking-service" fetch origin main
+          git -C "event-booking-service" checkout origin/main
 
       - name: Open PR against parent
         id: pr
         uses: peter-evans/create-pull-request@v7
         with:
           token: ${{ secrets.PARENT_PAT }}
-          commit-message: "chore: bump review-notification-service submodule"
-          branch: "bump/review-notification-service"
-          title: "chore: bump review-notification-service submodule"
+          commit-message: "chore: bump event-booking-service submodule"
+          branch: "bump/event-booking-service"
+          title: "chore: bump event-booking-service submodule"
           body: |
             Automated submodule pointer bump.
 
-            Source repository: Dinidu21/review-notification-service
+            Source repository: Dinidu21/event-booking-service
             Parent repository: Dinidu21/backend-services
-            Triggered by push to review-notification-service/main.
+            Triggered by push to event-booking-service/main.
 
           delete-branch: true
 
-      - name: Auto-merge
+      - name: Enable auto-merge
         if: steps.pr.outputs.pull-request-number
         env:
           GH_TOKEN: ${{ secrets.PARENT_PAT }}
         run: |
-          gh pr merge "${{ steps.pr.outputs.pull-request-number }}"             --repo "Dinidu21/backend-services"             --squash             --admin
+          gh pr merge "${{ steps.pr.outputs.pull-request-number }}" \
+            --repo "Dinidu21/backend-services" \
+            --squash \
+            --auto

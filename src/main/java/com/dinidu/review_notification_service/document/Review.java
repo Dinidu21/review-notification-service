@@ -1,24 +1,19 @@
 package com.dinidu.review_notification_service.document;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
 import java.time.Instant;
 import java.util.List;
 
-@Document(collection = "reviews")
 public class Review {
 
-    @Id
     private String id;
 
-    private Long eventId; // references event-booking-service's Event.id
-    private Long userId; // references user-service's User.id
-    private int rating; // 1-5
+    private Long eventId;
+    private Long userId;
+    private int rating;
     private String text;
-    private List<String> mediaUrls; // Cloud Storage URLs
+    private List<String> mediaUrls;
     private Instant createdAt = Instant.now();
 
-    // getters and setters
     public String getId() {
         return id;
     }

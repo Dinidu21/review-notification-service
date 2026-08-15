@@ -1,22 +1,17 @@
 package com.dinidu.review_notification_service.document;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
 import java.time.Instant;
 import java.util.Map;
 
-@Document(collection = "notifications_archive")
 public class NotificationArchive {
 
-    @Id
     private String id;
 
     private Long userId;
-    private String type; // e.g. "BOOKING_CONFIRMED", "EVENT_REMINDER"
-    private Map<String, Object> payload; // flexible schema — the actual point of using Mongo here
+    private String type;
+    private Map<String, Object> payload;
     private Instant createdAt = Instant.now();
 
-    // getters and setters
     public String getId() {
         return id;
     }

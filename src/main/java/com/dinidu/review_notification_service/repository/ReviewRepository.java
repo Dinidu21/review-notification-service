@@ -3,7 +3,6 @@ package com.dinidu.review_notification_service.repository;
 import com.dinidu.review_notification_service.document.Review;
 import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.*;
-
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
@@ -22,7 +21,6 @@ public class ReviewRepository {
     }
 
     public Review save(Review review) {
-
         try {
             DocumentReference document;
 
@@ -35,9 +33,7 @@ public class ReviewRepository {
                         .document(review.getId());
             }
 
-            ApiFuture<WriteResult> future = document.set(review);
-
-            future.get();
+            document.set(review).get();
 
             return review;
 
@@ -50,8 +46,86 @@ public class ReviewRepository {
         }
     }
 
-    public List<Review> findByEventId(Long eventId) {
+    public List<Review> findAll() {
+        try {
+            QuerySnapshot snapshot = firestore
+                    .collection(COLLECTION)
+                    .get()
+                    .get();
 
+            List<Review> reviews = new ArrayList<>();
+
+            for (QueryDocumentSnapshot document : snapshot.getDocuments()) {
+                Review review = document.toObject(Review.class);
+                review.setId(document.getId());
+                reviews.add(review);
+            }
+
+            return reviews;
+
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException("Interrupted while reading reviews", e);
+
+        } catch (ExecutionException e) {
+            throw new RuntimeException("Failed to read reviews", e);
+        }
+    }
+
+    public Review findById(String id) {
+        try {
+            DocumentSnapshot document = firestore
+                    .collection(COLLECTION)
+                    .document(id)
+                    .get()
+                    .get();
+
+            if (!document.exists()) {
+                throw new IllegalArgumentException("Review not found");
+            }
+
+            Review review = document.toObject(Review.class);
+            review.setId(document.getId());
+
+            return review;
+
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException("Interrupted while reading review", e);
+
+        } catch (ExecutionException e) {
+            throw new RuntimeException("Failed to read review", e);
+        }
+    }
+
+    public void deleteById(String id) {
+        try {
+            DocumentSnapshot document = firestore
+                    .collection(COLLECTION)
+                    .document(id)
+                    .get()
+                    .get();
+
+            if (!document.exists()) {
+                throw new IllegalArgumentException("Review not found");
+            }
+
+            firestore
+                    .collection(COLLECTION)
+                    .document(id)
+                    .delete()
+                    .get();
+
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException("Interrupted while deleting review", e);
+
+        } catch (ExecutionException e) {
+            throw new RuntimeException("Failed to delete review", e);
+        }
+    }
+
+    public List<Review> findByEventId(Long eventId) {
         try {
             ApiFuture<QuerySnapshot> future = firestore
                     .collection(COLLECTION)
@@ -63,10 +137,8 @@ public class ReviewRepository {
             List<Review> reviews = new ArrayList<>();
 
             for (QueryDocumentSnapshot document : documents) {
-
                 Review review = document.toObject(Review.class);
                 review.setId(document.getId());
-
                 reviews.add(review);
             }
 
@@ -82,7 +154,6 @@ public class ReviewRepository {
     }
 
     public List<Review> findByUserId(Long userId) {
-
         try {
             ApiFuture<QuerySnapshot> future = firestore
                     .collection(COLLECTION)
@@ -94,10 +165,8 @@ public class ReviewRepository {
             List<Review> reviews = new ArrayList<>();
 
             for (QueryDocumentSnapshot document : documents) {
-
                 Review review = document.toObject(Review.class);
                 review.setId(document.getId());
-
                 reviews.add(review);
             }
 
